@@ -1,0 +1,47 @@
+-- VISUAL ONLY - Freeze Death Pose
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local function freezeCharacter(character)
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+
+    humanoid.BreakJointsOnDeath = false
+    humanoid.RequiresNeck = false
+
+    for _, v in ipairs(character:GetDescendants()) do
+        if v:IsA("BasePart") then
+            v.Anchored = true
+            v.AssemblyLinearVelocity = Vector3.zero
+            v.AssemblyAngularVelocity = Vector3.zero
+        end
+    end
+
+    local animator = humanoid:FindFirstChildOfClass("Animator")
+    if animator then
+        for _, track in ipairs(animator:GetPlayingAnimationTracks()) do
+            track:AdjustSpeed(0)
+        end
+    end
+end
+
+local function onCharacter(character)
+    local humanoid = character:WaitForChild("Humanoid", 5)
+    if not humanoid then return end
+
+    humanoid.Died:Connect(function()
+        task.wait(0.03) -- pequeño delay para capturar la pose exacta
+        freezeCharacter(character)
+    end)
+end
+
+for _, plr in ipairs(Players:GetPlayers()) do
+    if plr.Character then
+        onCharacter(plr.Character)
+    end
+    plr.CharacterAdded:Connect(onCharacter)
+end
+
+Players.PlayerAdded:Connect(function(plr)
+    plr.CharacterAdded:Connect(onCharacter)
+end)
