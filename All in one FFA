@@ -1,10 +1,4 @@
 task.spawn(function()
-    --Kicia
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/kiciahook/kiciahook/refs/heads/main/loader.luau"))()
-    
-    print("Kicia injected!!!");
-    task.wait(1)
-    
     -- Death Pose Freeze
     loadstring(game:HttpGet("https://raw.githubusercontent.com/Nicht-Reden/Ultimate-FFa-HUB-Rivals-/refs/heads/main/Freeze%20Death%20Pose"))()
     
