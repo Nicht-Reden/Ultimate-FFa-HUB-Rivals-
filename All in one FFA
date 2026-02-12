@@ -1,0 +1,34 @@
+task.spawn(function()
+    --Kicia
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/kiciahook/kiciahook/refs/heads/main/loader.luau"))()
+    
+    print("Kicia injected!!!");
+    task.wait(1)
+    
+    -- Death Pose Freeze
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Nicht-Reden/Ultimate-FFa-HUB-Rivals-/refs/heads/main/Freeze%20Death%20Pose"))()
+    
+    print("Death Pose Freeze injected!!!");
+    task.wait(1)
+    
+    -- Staff Detector
+    shared.StaffDetectorLoading = false
+    autoload = false
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Ukrubojvo/Modules/main/StaffDetector.lua"))()
+    
+    print("Staff Detector injected!!!");
+    task.wait(1)
+    
+    -- Anti-AFK
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Nicht-Reden/Ultimate-FFa-HUB-Rivals-/refs/heads/main/Anti%20AFK"))()
+    
+    print("Anti AFK injected!!!");
+    task.wait(1)
+    
+    -- FFa Assist Script
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Nicht-Reden/Ultimate-FFa-HUB-Rivals-/refs/heads/main/FFa%20Assist%20Script"))()
+    print("FFa Assist injected!!!");
+    print("==============================");
+    print("Injection Complete!!!");
+    print("==============================");
+end)
