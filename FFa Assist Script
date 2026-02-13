@@ -15,6 +15,53 @@ mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 mainFrame.BorderSizePixel = 0
 mainFrame.Parent = screenGui
 
+local UIVisible = true
+local UIS = game:GetService("UserInputService")
+
+UIS.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.RightShift then -- Change key here if you want
+        UIVisible = not UIVisible
+        mainFrame.Visible = UIVisible
+    end
+end)
+
+local dragging = false
+local dragInput
+local dragStart
+local startPos
+
+local function update(input)
+    local delta = input.Position - dragStart
+    mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+mainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+mainFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+UIS.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)
+
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 30)
 title.BackgroundTransparency = 1
@@ -24,7 +71,17 @@ title.TextSize = 20
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.Parent = mainFrame
 
-local yPos = 40
+local keybindLabel = Instance.new("TextLabel")
+keybindLabel.Size = UDim2.new(1, 0, 0, 20)
+keybindLabel.Position = UDim2.new(0, 0, 0, 30)
+keybindLabel.BackgroundTransparency = 1
+keybindLabel.Text = "Menu keybind: RightShift"
+keybindLabel.Font = Enum.Font.SourceSans
+keybindLabel.TextSize = 14
+keybindLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+keybindLabel.Parent = mainFrame
+
+local yPos = 50
 local function addElement()
     yPos = yPos + 40
     mainFrame.Size = UDim2.new(0, 250, 0, yPos + 10)
@@ -127,17 +184,38 @@ local function createSlider(name, min, max, default, callback)
     end)
 end
 
+local VirtualInputManager = game:GetService("VirtualInputManager")
+
 _G.USE_FT = true
 _G.AUTO_RESPAWN = true
 _G.AUTO_COLLECT_HEALTH = true
 _G.AUTO_COLLECT_AMMO = true
 _G.COLLECT_RANGE = 1000
 
-createToggle("FireTouch Mode", false, function(val) _G.USE_FT = val end)
 createToggle("Auto Respawn", true, function(val) _G.AUTO_RESPAWN = val end)
 createToggle("Auto Health", true, function(val) _G.AUTO_COLLECT_HEALTH = val end)
 createToggle("Auto Ammo", true, function(val) _G.AUTO_COLLECT_AMMO = val end)
-createSlider("Collect Range", 50, 2000, 500, function(val) _G.COLLECT_RANGE = val end)
+createSlider("Collect Range", 500, 10000, 5000, function(val) _G.COLLECT_RANGE = val end)
+
+spawn(function()
+    while task.wait(0.1) do
+        if _G.AUTO_RESPAWN then
+            local character = Players.LocalPlayer.Character
+            if character then
+                local humanoid = character:FindFirstChild("Humanoid")
+                if humanoid and humanoid.Health <= 0 then
+                    local spamEnd = tick() + 1
+                    while tick() < spamEnd do
+                        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Space, false, game)
+                        task.wait(0.05)
+                        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Space, false, game)
+                        task.wait(0.05)
+                    end
+                end
+            end
+        end
+    end
+end)
 
 spawn(function()
     RunService.RenderStepped:Connect(function()
@@ -169,3 +247,5 @@ spawn(function()
         end
     end)
 end)
+
+print("TO OPEN/CLOSE MENU PRESS RIGHT SHIFT")
